@@ -5,16 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <title>Tony van Swet - Software + Decarbonisation</title>
+    <meta
+      name="description"
+      content="Tony van Swet - Software and Decarbonisation"
+    />
+    <meta property="og:image" content="/sharing-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="627" />
+    <link rel="icon" href="/favicon.ico" />
     <link href="/css/output.css" rel="stylesheet" />
-    <title>Go + HTMX + Tailwind</title>
   </head>
   <body>
     <main>
-      <div class="md:container md:mx-auto">
-        <h1 class="text-3xl">Go + HTMX + Tailwind Example</h1>
-        <br/>
-        <span class="text-xl">Companies</span>
-        <div>{{ template "companies.html" . }}</div>
+      <div
+        class="flex min-h-screen w-full flex-col bg-black p-4 font-mono text-xs text-green-500 md:text-sm"
+      >
+        <div class="max-w-md space-y-4">
+          <div class="space-y-2">
+            {{ range .Grid }}
+            <div class="flex flex-row gap-x-0">
+              {{ range . }}
+              <div
+                class="h-3 w-full {{ if eq . 1 }} glow-shadow bg-green-500{{ else }}bg-transparent{{ end }}"
+              ></div>
+              {{ end }}
+            </div>
+            {{ end }}
+          </div>
+          <div
+            class="flex flex-col items-center justify-center text-center font-sans text-xl"
+          >
+            <p class="text-shadow-neon-green p-2 text-2xl font-bold">
+              Tony van Swet
+            </p>
+            <p class="text-shadow-neon-green p-4 pt-0 text-2xl font-bold">
+              Software Engineer
+            </p>
+            <div class="w-48 border-2 border-x-[3px] border-green-500 p-0.5">
+              <div
+                class="border-2 border-x-[3px] border-green-500 p-4 text-center text-base"
+              >
+                <p>Portfolio Website</p>
+                <p>Version 1.00</p>
+              </div>
+            </div>
+            <p class="p-4 text-xl">
+              (C) Copyright TVS Corp 1987
+              <br />
+              (C) Copyright Appy Ltd 2016
+            </p>
+            <p class="text-xs md:text-xl">
+              Implemented by
+              <span class="text-shadow-neon-green">Tony van Swet</span>
+              <br />
+              Produced by Appy
+            </p>
+            <a
+              href="https://www.linkedin.com/in/tony-van-swet-39374b72/"
+              class="underline"
+              >Find me on LinkedIn</a
+            >
+            <a href="https://github.com/tonypls" class="underline"
+              >Find me on Github</a
+            >
+            <button
+              class="mt-4 cursor-pointer text-base"
+              onClick="{handleStartDoom}"
+            >
+              Want to play doom (press
+              <span class="text-shadow-neon-green"> ENTER</span>
+              to start)?
+              <span class="h-1 animate-ping bg-green-500">_</span>
+            </button>
+          </div>
+        </div>
       </div>
     </main>
   </body>

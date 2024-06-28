@@ -10,13 +10,10 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/jritsema/gotoolbox"
-	"github.com/jritsema/gotoolbox/web"
 )
 
 var (
-	//go:embed all:templates/*
+	//go:embed templates/*
 	templateFS embed.FS
 
 	//go:embed css/output.css
@@ -26,14 +23,17 @@ var (
 	html *template.Template
 )
 
-func main() {
+type GridData struct {
+	Grid [][]int
+}
 
+func main() {
 	//exit process immediately upon sigterm
 	handleSigTerms()
 
 	//parse templates
 	var err error
-	html, err = web.TemplateParseFSRecursive(templateFS, ".html", true, nil)
+	html, err = template.ParseFS(templateFS, "templates/*.html")
 	if err != nil {
 		panic(err)
 	}
@@ -42,17 +42,8 @@ func main() {
 	router := http.NewServeMux()
 	router.Handle("/css/output.css", http.FileServer(http.FS(css)))
 
-	router.Handle("/company/add", web.Action(companyAdd))
-	router.Handle("/company/add/", web.Action(companyAdd))
-
-	router.Handle("/company/edit", web.Action(companyEdit))
-	router.Handle("/company/edit/", web.Action(companyEdit))
-
-	router.Handle("/company", web.Action(companies))
-	router.Handle("/company/", web.Action(companies))
-
-	router.Handle("/", web.Action(index))
-	router.Handle("/index.html", web.Action(index))
+	router.HandleFunc("/", indexHandler)
+	router.HandleFunc("/index.html", indexHandler)
 
 	//logging/tracing
 	nextRequestID := func() string {
@@ -61,11 +52,31 @@ func main() {
 	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
 	middleware := tracing(nextRequestID)(logging(logger)(router))
 
-	port := gotoolbox.GetEnvWithDefault("PORT", "8080")
+	port := "8080"
 	logger.Println("listening on http://localhost:" + port)
 	if err := http.ListenAndServe(":"+port, middleware); err != nil {
 		logger.Println("http.ListenAndServe():", err)
 		os.Exit(1)
+	}
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	grid := [][]int{
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+		{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+	}
+
+	fmt.Println("Grid Data:", grid)
+
+	data := GridData{Grid: grid}
+	if err := html.ExecuteTemplate(w, "index.html", data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

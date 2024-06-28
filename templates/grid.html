@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grid Generator</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .h-3 {
+        height: 0.75rem;
+      }
+      .w-full {
+        width: 100%;
+      }
+      .bg-green-500 {
+        background-color: #10b981;
+      }
+      .bg-transparent {
+        background-color: transparent;
+      }
+      .glow-shadow {
+        box-shadow: 0 0 10px #10b981;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="space-y-2">
+      {{ range .Grid }}
+      <div class="flex flex-row gap-x-0">
+        {{ range . }}
+        <div
+          class="h-3 w-full {{ if eq . 1 }}glow-shadow bg-green-500{{ else }}bg-transparent{{ end }}"
+        ></div>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+  </body>
+</html>
