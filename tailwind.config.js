@@ -3,9 +3,6 @@ module.exports = {
   content: ["./templates/**/*.{html,js}"],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ["MS-DOS"],
-      },
       textShadow: {
         "neon-green": "0 0 1px #00cc00, 0 0 5px #00cc00",
       },

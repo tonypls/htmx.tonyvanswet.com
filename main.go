@@ -19,6 +19,8 @@ var (
 	//go:embed css/output.css
 	css embed.FS
 
+	staticFs embed.FS
+
 	//parsed templates
 	html *template.Template
 )
@@ -37,10 +39,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	fs := http.FileServer(http.Dir("./static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
 
 	//add routes
 	router := http.NewServeMux()
 	router.Handle("/css/output.css", http.FileServer(http.FS(css)))
+	router.Handle("/favicon.ico", http.FileServer(http.FS(staticFs)))
 
 	router.HandleFunc("/", indexHandler)
 	router.HandleFunc("/index.html", indexHandler)
@@ -69,10 +75,9 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0},
 		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1},
 		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
+		{0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
 	}
 
-	fmt.Println("Grid Data:", grid)
 
 	data := GridData{Grid: grid}
 	if err := html.ExecuteTemplate(w, "index.html", data); err != nil {
