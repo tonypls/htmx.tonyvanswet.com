@@ -1,11 +1,4 @@
-# go-htmx-tailwind-example
-
-Example CRUD app written in Go + HTMX + Tailwind CSS
-
-This project implements a pure dynamic web app with SPA-like features but without heavy complex Javascript or Go frameworks to keep up with.  Just HTML/CSS + Go ❤️
-
-![screenshot](./screenshot.jpeg)
-
+# Playing around with htmx and go
 
 ## Develop
 
